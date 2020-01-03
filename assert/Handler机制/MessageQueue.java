@@ -534,6 +534,7 @@ public final class MessageQueue {
     }
 
     boolean enqueueMessage(Message msg, long when) {
+        // msg 必须有target也就是必须有handler
         if (msg.target == null) {
             throw new IllegalArgumentException("Message must have a target.");
         }
@@ -551,13 +552,20 @@ public final class MessageQueue {
             }
 
             msg.markInUse();
+
+             //when 表示这个消息执行的时间，队列是按照消息执行时间排序的
             msg.when = when;
             Message p = mMessages;
             boolean needWake;
             if (p == null || when == 0 || when < p.when) {
                 // New head, wake up the event queue if blocked.
+                // 如果p为null则表示当前消息队列没有消息
                 msg.next = p;
+
+                //初始化头消息(改变了总是指向新的消息)
                 mMessages = msg;
+
+                //true代表有无消息，阻塞线程，false代表有消息，没有阻塞线程
                 needWake = mBlocked;
             } else {
                 // Inserted within the middle of the queue.  Usually we don't have to wake
@@ -565,6 +573,7 @@ public final class MessageQueue {
                 // and the message is the earliest asynchronous message in the queue.
                 needWake = mBlocked && p.target == null && msg.isAsynchronous();
                 Message prev;
+                //将消息放到队列，消息是按照msg的when 排序
                 for (;;) {
                     prev = p;
                     p = p.next;
@@ -575,6 +584,8 @@ public final class MessageQueue {
                         needWake = false;
                     }
                 }
+                //是否唤醒Looper等待的线程
+                
                 msg.next = p; // invariant: p == prev.next
                 prev.next = msg;
             }

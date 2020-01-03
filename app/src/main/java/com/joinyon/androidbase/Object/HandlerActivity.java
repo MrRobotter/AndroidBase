@@ -1,6 +1,7 @@
 package com.joinyon.androidbase.Object;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,7 +31,7 @@ public class HandlerActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 mainHandler.sendEmptyMessage(0);
-                Log.e("TAG", "Thread=" + Thread.currentThread().getName() + ",发送消息");
+                Log.e("TAG", "Thread=" + Thread.currentThread().getName() + ",发送消息=0");
 
             }
         }.start();
@@ -40,12 +41,16 @@ public class HandlerActivity extends AppCompatActivity {
             @Override
             public void run() {
                 super.run();
+                Looper.prepare();
                 childHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
                         super.handleMessage(msg);
+                        Log.e("TAG", "Thread=" + Thread.currentThread().getName() + ",收到线程返回的消息=" + msg.what);
                     }
                 };
+
+                Looper.loop();
             }
         }.start();
     }
@@ -68,6 +73,8 @@ public class HandlerActivity extends AppCompatActivity {
 
 
     public void sendToChild(View view) {
-        //childHandler.sendEmptyMessage(1);
+        childHandler.sendEmptyMessage(1);
+        Log.e("TAG", "Thread=" + Thread.currentThread().getName() + ",发送消息=1");
+
     }
 }
