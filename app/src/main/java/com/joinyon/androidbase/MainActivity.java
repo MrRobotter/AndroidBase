@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
-    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
